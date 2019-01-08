@@ -1,0 +1,118 @@
+/* Main cascading stylesheet for bombgame.html */
+BODY {
+    font-family:    Verdana, sans-serif;
+    font-size:      12pt;
+    text-align:     left;
+}
+
+A { text-decoration: none; }
+
+SMALL { font-size: 9pt; }
+BIG { font-size: 14pt; }
+
+P, UL, OL, BLOCKQUOTE {
+    font-family:    Verdana, sans-serif;
+    font-size:      12pt;
+}
+
+SUP, SUB {
+    font-size:      9pt;
+}
+
+BLOCKQUOTE { margin-left: 2em; }
+
+TT, CODE {
+    font-family: Courier, monospace;
+    font-size: 14pt;
+}
+
+P.ref {
+	margin-left:	2em;
+}
+
+SPAN {
+    font-size:    12pt;
+    font-family:  Verdana, sans-serif;
+    font-weight:  bold;
+}
+
+SPAN.menu, SPAN.cool  { color: #337700; }
+SPAN.staff { color: #337700; }
+SPAN.label { color: black; }
+SPAN.body  { font-weight: normal; }
+SPAN.term  {
+  font-family: Trebuchet MS, Verdana, sans-serif;
+  font-size:   14pt;
+  font-weight: bold;
+  color:       #990000;
+}
+SPAN.output, SPAN.printf, SPAN.input {
+  font-family:	Courier, monospace;
+  font-weight:	bold;
+  color:	blue;
+}
+SPAN.input { color: #009600; }
+SPAN.printf { color: #960096; }
+SPAN.err, SPAN.comment {
+  font-family:  Courier, monospace;
+  font-weight:  normal;
+  color:        red;
+}
+SPAN.err { font-style: italic; }
+SPAN.param {
+  font-style:	italic;
+  font-size:	10pt;
+  color:	#555555;
+}
+SPAN.def { color: #550000; }
+SPAN.val {
+   font-family:  Courier, monospace;
+   font-weight:  normal;
+   color:        #555599;
+}
+
+H1, H2, H3, H4 {
+    font-family:  Trebuchet MS, Verdana, sans-serif;
+    color:        #990000;
+}
+
+H1 { font-size: 26pt; }
+H2 { font-size: 22pt; }
+H3 { font-size: 18pt; }
+H4 { font-size: 14pt; }
+
+PRE {
+    font-family: Courier, monospace;
+    margin-left: 1em;
+    font-size: 12pt;
+    text-align: left;
+}
+
+XMP, KBD {
+    font-family: Courier, sans-serif;
+    font-size: 10pt;
+}
+
+XMP { margin-left: 1em; }
+
+TH {
+   font-family:	Verdana, sans-serif;
+   font-size:	12pt;
+   font-weight:	bold;
+}
+
+TD {
+   font-family:	Verdana, sans-serif;
+   font-size:	12pt;
+}
+
+TD PRE {
+    font-family: Courier, sans-serif;
+    margin-left: 1em;
+    font-size: 12pt;
+}
+
+TD TT {
+    font-family: Courier, monospace;
+    font-size: 12pt;
+}

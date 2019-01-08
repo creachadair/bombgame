@@ -1,0 +1,429 @@
+<html>
+<head>
+  <title>Example: Tic Tac Toe, Mark 2</title>
+  <link rel="stylesheet" href="bombgame.css" type="text/css">
+<!-- "Bombs and Flowers"
+
+     A simple tic-tac-toe referee to illustrate interactive content
+     using JavaScript.
+
+     Topics of interest:
+     - Image objects, preloading
+     - Arrays, indexed by numbers and by strings
+     - The 'for' type of loop
+     - Global vs. local variables
+     - How to read radio buttons
+
+     Copyright (C) 2002 M. J. Fromberger, All Rights Reserved.
+  -->
+
+<script language="JavaScript">
+<!--
+  var currentPlayer = "None";        // Initially, no game is going
+  var boardState = new Array();
+  var offImages = new Array();
+  var onImages = new Array();
+  var numMoves = 0;
+
+  // Preload all the images so they can be switched quickly
+  offImages['blank'] = new Image(128, 128);
+  offImages['ex'] = new Image(128, 128);
+  offImages['oh'] = new Image(128, 128);
+
+  onImages['blank'] = new Image(128, 128);
+  onImages['ex'] = new Image(128, 128);
+  onImages['oh'] = new Image(128, 128);
+
+  offImages['blank'].src = "img/blank-off.gif";
+  onImages['blank'].src = "img/blank-on.gif";
+
+  offImages['ex'].src = "img/ex-off.gif";
+  onImages['ex'].src = "img/ex-on.gif";
+
+  offImages['oh'].src = "img/oh-off.gif";
+  onImages['oh'].src = "img/oh-on.gif";
+
+  // Reset the board so that a new game can be started
+  function resetBoard() {
+    var i, imageName;
+
+    for (i = 1; i <= 9; i += 1) {
+      boardState[i] = 'blank';
+
+      imageName = "sq" + i;
+      document.images[imageName].src = offImages['blank'].src;
+    }
+    currentPlayer = 'None';
+    numMoves = 0;
+  }
+
+  // Start up a new game
+  function startGame() {
+    var i;
+
+    resetBoard();
+
+    for (i = 0; i < document.controls.firstPlayer.length; i += 1) {
+      if (document.controls.firstPlayer[i].checked) {
+        currentPlayer = document.controls.firstPlayer[i].value;
+        break;
+      }
+    }
+
+    document.controls.status.value = "New game -- make your first move!";
+  }
+
+  // Update the image in a particular square in response to the mouse
+  // moving over it (shows or hides the hilight, as appropriate)
+  //
+  // The 'square' parameter is which square to set
+  // The 'state' parameter is either "on" or "off"
+
+  function setImage(square, state) {
+    var imageName = "sq" + square;
+    var imageType = boardState[square];
+
+    if (state == "on")  {
+      document.images[imageName].src =
+        onImages[imageType].src;
+    } else {
+      document.images[imageName].src =
+        offImages[imageType].src;
+    }
+  }
+
+  // Handle clicks on the images.  When no game is going, or if you click
+  // on a square with something already in it, you get an error; otherwise,
+  // this function updates the state of the board and draws the new object
+  // in the cell.
+  //
+  // Once this happens, we have to check for a winner!
+
+  function clickOn(square) {
+    if (currentPlayer == "None") {
+      alert("No game is currently in progress, click 'New Game' to begin!");
+    } else if (boardState[square] != "blank") {
+      alert("Sorry, that square is already occupied.");
+    } else {
+      var imageName = "sq" + square;
+
+      numMoves += 1;
+      boardState[square] = currentPlayer;
+      document.images[imageName].src = offImages[currentPlayer].src;
+
+      var winner = checkForWin(boardState);
+
+      if (winner == currentPlayer) {
+        var winnerName;
+
+        if (currentPlayer == "ex") {
+          winnerName = "Bomb";
+        } else {
+          winnerName = "Flower";
+        }
+        document.controls.status.value =
+                     "Congratulations, the " + winnerName +
+                     " player has won the game after " + numMoves + " moves!";
+
+        currentPlayer = "None";
+      } else if (winner == "draw") {
+        document.controls.status.value = "Aww, the game is a draw!";
+        currentPlayer = "None";
+      } else {
+        document.controls.status.value = "Okay, next move!";
+        togglePlayer();
+      }
+    }
+  }
+
+  // This is the main function called to have the computer make a move
+
+  function doComputerMove() {
+    if (currentPlayer == "None") {
+      alert("No game is currently in progress, click 'New Game' to begin!");
+    } else {
+      var bestMove = 5;  // Always take the middle cell first, if possible
+
+      document.controls.status.value = "The computer is considering the next move...";
+      if (numMoves > 0)
+        bestMove = chooseMove(currentPlayer, boardState);
+
+      document.controls.status.value = "The computer chooses cell " + bestMove;
+      clickOn(bestMove);
+    }
+  }
+
+  // Set whose turn it is
+  function togglePlayer() {
+    if (currentPlayer == "ex") {
+      currentPlayer = "oh";
+    } else {
+      currentPlayer = "ex";
+    }
+  }
+
+  // Check whether anybody has won the game
+  function checkForWin(boardState) {
+    if (boardState[1] != "blank" &&
+       ((boardState[1] == boardState[2] && boardState[2] == boardState[3]) ||
+        (boardState[1] == boardState[4] && boardState[4] == boardState[7]))) {
+      return boardState[1];
+    } else if (boardState[5] != "blank" &&
+              ((boardState[4] == boardState[5] &&
+		boardState[5] == boardState[6]) ||
+               (boardState[2] == boardState[5] &&
+		boardState[5] == boardState[8]) ||
+               (boardState[1] == boardState[5] &&
+		boardState[5] == boardState[9]) ||
+               (boardState[7] == boardState[5] &&
+		boardState[5] == boardState[3]))) {
+      return boardState[5];
+    } else if (boardState[9] != "blank" &&
+              ((boardState[3] == boardState[6] &&
+		boardState[6] == boardState[9]) ||
+               (boardState[7] == boardState[9] &&
+		boardState[8] == boardState[9]))) {
+      return boardState[9];
+    }
+
+    // If we didn't find a win, we'll check for a draw by counting the number
+    // of blank squares remaining.
+
+    var i, numBlank;
+
+    numBlank = 0;
+    i = 1;
+    while (i <= 9) {
+      if (boardState[i] == "blank") {
+        numBlank += 1;
+      }
+
+      i += 1;
+    }
+
+    if (numBlank == 0) {
+      return "draw";
+    } else {
+      return "none";
+    }
+  }
+
+  // Pick a move for whatever player we're asked to.
+
+  function chooseMove(player, position) {
+    var move, newBoard;
+
+    if (player == "ex") {
+      move = maxMove(position);
+    } else {
+      move = minMove(position);
+    }
+    newBoard = move[1];
+
+    for (var i = 1; i <= position.length; i++) {
+      if (position[i] != newBoard[i]) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  function maxMove(pos) {
+    var moves = nextStates("ex", pos);
+    var bestCost, bestPos;
+
+    if (moves.length == 0) {
+      return [ evalBoard(pos), pos ];
+    }
+
+    bestCost = -100;
+    bestPos = -1;
+    for (var i = 0; i < moves.length; i++) {
+      if (checkForWin(moves[i]) == "ex") {
+        return [ 100, moves[i] ];
+      }
+      var best = minMove(moves[i]);
+
+      if (best[0] > bestCost) {
+        bestCost = best[0];
+        bestPos = i;
+      }
+    }
+
+    return [ bestCost, moves[bestPos] ];
+  }
+
+  function minMove(pos) {
+    var moves = nextStates("oh", pos);
+    var worstCost, worstPos;
+
+    if (moves.length == 0) {
+      return [ evalBoard(pos), pos ];
+    }
+    worstCost = 100;
+    worstPos = -1;
+    for (var i = 0; i < moves.length; i++) {
+      if (checkForWin(moves[i]) == "oh") {
+        return [ -100, moves[i] ];
+      }
+      var worst = maxMove(moves[i]);
+
+      if (worst[0] < worstCost) {
+        worstCost = worst[0];
+        worstPos = i;
+      }
+    }
+
+    return [ worstCost, moves[worstPos] ];
+  }
+
+  // Generate all the boards that can be created by placing the
+  // given player's piece in each of the empty squares
+
+  function nextStates(player, position) {
+    var output = new Array();
+    var pos = 0;
+
+    for (var i = 1; i <= position.length; i++) {
+      if (position[i] == "blank") {
+        output[pos] = copyBoard(position, i, player);
+        ++pos;
+      }
+    }
+
+    return output;
+  }
+
+  // Make a copy of an existing board position, replacing the token
+  // at position pos with the new piece val.
+
+  function copyBoard(oldBoard, pos, val) {
+    var newBoard = new Array();
+
+    for (var i = 1; i <= oldBoard.length; i++) {
+      newBoard[i] = oldBoard[i];
+    }
+    newBoard[pos] = val;
+
+    return newBoard;
+  }
+
+  // Evaluate the "goodness" of a board position
+  // A board that has a win for "ex" looks positive, a win for "oh" looks
+  // negative. Anything else (draw, or an ongoing game) is valued neutrally.
+
+  function evalBoard(pos) {
+    var cond = checkForWin(pos);
+
+    if (cond == "ex") {
+      return 1;
+    } else if (cond == "oh") {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+//-->
+</script>
+
+</head>
+<body bgcolor="white">
+
+<h1 align="center">
+  Bombs and Flowers, Mark II</h1>
+
+<p>This is a game like Tic Tac Toe (Noughts and Crosses), except that
+the images are different.  This is similar to the <a
+href="bombgame.html"> original version</a>, but now there is a
+computer opponent who can play against you.  This demonstrates how
+search can be used to get a computer to play games and solve other
+types of complex problems.</p>
+
+<table align="center" border="1">
+<tr>
+  <td><a href="javascript:clickOn(1)"
+         onMouseOver="setImage(1,'on')" onMouseOut="setImage(1,'off')">
+      <img name="sq1" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(2)"
+         onMouseOver="setImage(2,'on')" onMouseOut="setImage(2,'off')">
+      <img name="sq2" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(3)"
+         onMouseOver="setImage(3,'on')" onMouseOut="setImage(3,'off')">
+      <img name="sq3" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+</tr>
+<tr>
+  <td><a href="javascript:clickOn(4)"
+         onMouseOver="setImage(4,'on')" onMouseOut="setImage(4,'off')">
+      <img name="sq4" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(5)"
+         onMouseOver="setImage(5,'on')" onMouseOut="setImage(5,'off')">
+      <img name="sq5" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(6)"
+         onMouseOver="setImage(6,'on')" onMouseOut="setImage(6,'off')">
+      <img name="sq6" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+</tr>
+<tr>
+  <td><a href="javascript:clickOn(7)"
+         onMouseOver="setImage(7,'on')" onMouseOut="setImage(7,'off')">
+      <img name="sq7" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(8)"
+         onMouseOver="setImage(8,'on')" onMouseOut="setImage(8,'off')">
+      <img name="sq8" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+  <td><a href="javascript:clickOn(9)"
+         onMouseOver="setImage(9,'on')" onMouseOut="setImage(9,'off')">
+      <img name="sq9" src="img/blank-off.gif" width="128" height="128" border="0">
+      </a></td>
+</tr>
+</table>
+
+<form name="controls">
+  <p>Current game status:
+    <input type="text" name="status" size="64" readonly></p>
+
+  <p>First player plays this token:
+    <input type="radio" name="firstPlayer" value="ex" checked>Bombs
+    <input type="radio" name="firstPlayer" value="oh">Flowers</p>
+
+  <p align="center">
+    <input type="button" value="New Game" onClick="startGame()">
+    <input type="button" value="Computer Move" onClick="doComputerMove()">
+  </p>
+</form>
+
+<a name="instructions"></a>
+<h3>Instructions:</h3>
+<ul>
+  <li><p>To start a new game, or to start over in the middle of a game,
+      click the <strong>New Game</strong> button.</p>
+
+  <li><p>Take a turn by clicking in an empty cell.  The objective is to
+      get three of the same symbol in a single row, column, or diagonal.</p>
+
+  <li><p>Play alternates between two players until somebody wins, or until
+      there are no empty squares left.</p>
+
+  <li><p>To have the computer move for you, click on the <strong>Computer
+      Move</strong> button.</p>
+
+  <li><p>The current status of the game is displayed in the text field
+      below the game board.</p>
+</ul>
+
+
+<script language="JavaScript">
+<!--
+  resetBoard();
+//-->
+</script>
+</body>
+</html>
